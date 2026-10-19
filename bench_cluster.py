@@ -176,7 +176,11 @@ def main():
         output["sail"] = bench_sail()
 
     if not args.sail_only:
-        output["spark"] = bench_spark()
+        try:
+            output["spark"] = bench_spark()
+        except Exception as e:
+            print(f"\nSpark benchmark failed: {e}", flush=True)
+            print("Saving partial results (Sail only).", flush=True)
 
     # Summary
     if "sail" in output and "spark" in output:

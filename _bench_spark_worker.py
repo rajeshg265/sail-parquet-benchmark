@@ -91,12 +91,22 @@ for qid, sql in FRTB_QUERIES:
     times = []
     for _ in range(N_RUNS):
         t0 = time.time()
-        spark.sql(sql).collect()
-        times.append(round((time.time() - t0) * 1000, 1))
-    med = round(statistics.median(times), 1)
-    p99 = sorted(times)[max(0, int(len(times) * 0.99) - 1)]
-    print(f"    median={med:>7.0f}ms  p99={p99:>7.0f}ms  all={[round(t) for t in times]}", file=sys.stderr, flush=True)
-    results[qid] = {"median_ms": med, "p99_ms": p99, "times_ms": times}
+        try:
+            spark.sql(sql).collect()
+            times.append(round((time.time() - t0) * 1000, 1))
+        except Exception as e:
+            print(f"    run failed: {e}", file=sys.stderr, flush=True)
+    if times:
+        med = round(statistics.median(times), 1)
+        p99 = sorted(times)[max(0, int(len(times) * 0.99) - 1)]
+        print(f"    median={med:>7.0f}ms  p99={p99:>7.0f}ms  all={[round(t) for t in times]}", file=sys.stderr, flush=True)
+        results[qid] = {"median_ms": med, "p99_ms": p99, "times_ms": times}
+    else:
+        print(f"    all runs failed — skipping", file=sys.stderr, flush=True)
+        results[qid] = {"median_ms": None, "p99_ms": None, "times_ms": [], "error": "all runs failed"}
 
-spark.stop()
+try:
+    spark.stop()
+except Exception:
+    pass
 print(json.dumps(results))  # JSON to stdout for parent to capture
