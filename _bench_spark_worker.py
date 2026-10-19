@@ -15,12 +15,6 @@ N_RUNS   = 10
 PARQUET1_VIEW = "frtb_sa_capital_output"
 
 FRTB_QUERIES = [
-    ("scan_only_count",
-     f"""SELECT COUNT(*) FROM {PARQUET1_VIEW}"""),
-
-    ("scan_only_sum1col",
-     f"""SELECT SUM(total) FROM {PARQUET1_VIEW}"""),
-
     ("full_agg",
      f"""SELECT SUM(commodities_delta+commodities_vega+commodities_curvature) AS commodities_sa,
                 SUM(equities_delta+equities_vega+equities_curvature) AS equities_sa,
@@ -59,6 +53,12 @@ FRTB_QUERIES = [
          JOIN cobdate d ON f.cobdate = d.cobdate
          GROUP BY d.fiscal_year, d.fiscal_quarter
          ORDER BY d.fiscal_year, d.fiscal_quarter"""),
+
+    ("scan_only_count",
+     f"""SELECT COUNT(*) FROM {PARQUET1_VIEW}"""),
+
+    ("scan_only_sum1col",
+     f"""SELECT SUM(total) FROM {PARQUET1_VIEW}"""),
 ]
 
 os.environ["SPARK_LOCAL_IP"]   = "127.0.0.1"

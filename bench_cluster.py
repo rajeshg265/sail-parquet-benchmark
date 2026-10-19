@@ -35,12 +35,6 @@ COMBINED_VIEW = "frtb_sa_capital_output"
 N_RUNS        = 10
 
 FRTB_QUERIES = [
-    ("scan_only_count",
-     f"""SELECT COUNT(*) FROM {COMBINED_VIEW}"""),
-
-    ("scan_only_sum1col",
-     f"""SELECT SUM(total) FROM {COMBINED_VIEW}"""),
-
     ("full_agg",
      f"""SELECT SUM(commodities_delta+commodities_vega+commodities_curvature) AS commodities_sa,
                 SUM(equities_delta+equities_vega+equities_curvature) AS equities_sa,
@@ -79,6 +73,12 @@ FRTB_QUERIES = [
          JOIN cobdate d ON f.cobdate = d.cobdate
          GROUP BY d.fiscal_year, d.fiscal_quarter
          ORDER BY d.fiscal_year, d.fiscal_quarter"""),
+
+    ("scan_only_count",
+     f"""SELECT COUNT(*) FROM {COMBINED_VIEW}"""),
+
+    ("scan_only_sum1col",
+     f"""SELECT SUM(total) FROM {COMBINED_VIEW}"""),
 ]
 
 
