@@ -157,15 +157,17 @@ def bench_spark():
         stderr=None,   # stderr flows through to terminal so progress is visible
         text=True,
     )
-    # Try to parse JSON even if exit code is non-zero — the JVM may crash
-    # during Netty shutdown (Windows) after results are already written.
-    stdout = proc.stdout.strip()
-    if stdout:
-        try:
-            return json.loads(stdout)
-        except json.JSONDecodeError:
-            pass
-    raise RuntimeError(f"Spark worker exited with code {proc.returncode} and produced no valid JSON")
+    # Scan lines in reverse — JSON is the last line printed by the worker.
+    # Earlier lines may contain PySpark startup output that corrupts a whole-
+    # buffer json.loads().
+    for line in reversed(proc.stdout.splitlines()):
+        line = line.strip()
+        if line.startswith('{'):
+            try:
+                return json.loads(line)
+            except Exception:
+                continue
+    raise RuntimeError(f"Spark worker exited {proc.returncode}, no valid JSON in stdout")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
