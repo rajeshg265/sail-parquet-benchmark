@@ -144,16 +144,6 @@ hr{border:none;border-top:1px solid var(--border);margin:40px 0;}
       </thead>
       <tbody>
         <tr>
-          <td><div class="qname">scan_only_count</div></td>
-          <td><div class="qsql">SELECT COUNT(*) FROM frtb_sa_capital_output</div></td>
-          <td class="num td-sail">5 ms</td><td class="num td-spark">411 ms</td><td class="ratio hi">82×</td>
-        </tr>
-        <tr>
-          <td><div class="qname">scan_only_sum1col</div></td>
-          <td><div class="qsql">SELECT SUM(total) FROM frtb_sa_capital_output</div></td>
-          <td class="num td-sail">82 ms</td><td class="num td-spark">874 ms</td><td class="ratio hi">10.7×</td>
-        </tr>
-        <tr>
           <td><div class="qname">filtered_agg</div></td>
           <td><div class="qsql">SELECT legal_entity_group_id, SUM(total), SUM(equities_delta), SUM(interest_rates_delta) FROM frtb_sa_capital_output WHERE legal_entity_group_id &lt; 17 GROUP BY …</div></td>
           <td class="num td-sail">272 ms</td><td class="num td-spark">2,445 ms</td><td class="ratio hi">9.0×</td>
@@ -182,6 +172,16 @@ hr{border:none;border-top:1px solid var(--border);margin:40px 0;}
           <td><div class="qname">full_agg</div></td>
           <td><div class="qsql">SELECT SUM(commodities_delta+commodities_vega+commodities_curvature), SUM(equities_delta+…), … (12 double columns) FROM frtb_sa_capital_output</div></td>
           <td class="num td-sail">3,134 ms</td><td class="num td-spark">5,735 ms</td><td class="ratio lo">1.8×</td>
+        </tr>
+        <tr>
+          <td><div class="qname">scan_only_count</div></td>
+          <td><div class="qsql">SELECT COUNT(*) FROM frtb_sa_capital_output</div></td>
+          <td class="num td-sail">5 ms</td><td class="num td-spark">411 ms</td><td class="ratio hi">82×</td>
+        </tr>
+        <tr>
+          <td><div class="qname">scan_only_sum1col</div></td>
+          <td><div class="qsql">SELECT SUM(total) FROM frtb_sa_capital_output</div></td>
+          <td class="num td-sail">82 ms</td><td class="num td-spark">874 ms</td><td class="ratio hi">10.7×</td>
         </tr>
       </tbody>
     </table>
