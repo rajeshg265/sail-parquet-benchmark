@@ -27,7 +27,7 @@ import argparse
 import subprocess
 from pathlib import Path
 
-DATA_DIR    = str(Path(__file__).parent / "data")
+DATA_DIR    = os.environ.get("BENCHMARK_DATA_DIR") or str(Path(__file__).parent / "data")
 RESULTS_DIR = Path(__file__).parent / "results"
 RESULTS_DIR.mkdir(exist_ok=True)
 
@@ -35,6 +35,12 @@ COMBINED_VIEW = "frtb_sa_capital_output"
 N_RUNS        = 10
 
 FRTB_QUERIES = [
+    ("scan_only_count",
+     f"""SELECT COUNT(*) FROM {COMBINED_VIEW}"""),
+
+    ("scan_only_sum1col",
+     f"""SELECT SUM(total) FROM {COMBINED_VIEW}"""),
+
     ("full_agg",
      f"""SELECT SUM(commodities_delta+commodities_vega+commodities_curvature) AS commodities_sa,
                 SUM(equities_delta+equities_vega+equities_curvature) AS equities_sa,
@@ -110,12 +116,12 @@ def bench_sail():
     from pysail.spark import SparkConnectServer
     from pyspark.sql import SparkSession
 
-    srv = SparkConnectServer(port=50057)
+    srv = SparkConnectServer(port=50058)
     srv.start(background=True)
     time.sleep(5)
 
     spark = (SparkSession.builder
-             .remote("sc://localhost:50057")
+             .remote("sc://localhost:50058")
              .appName("bench_parquet_cluster_sail")
              .getOrCreate())
 

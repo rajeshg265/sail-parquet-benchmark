@@ -10,11 +10,17 @@ from pathlib import Path
 for _k in ["SPARK_REMOTE", "SPARK_CONNECT_MODE_ENABLED"]:
     os.environ.pop(_k, None)
 
-DATA_DIR = str(Path(__file__).parent / "data")
+DATA_DIR = os.environ.get("BENCHMARK_DATA_DIR") or str(Path(__file__).parent / "data")
 N_RUNS   = 10
 PARQUET1_VIEW = "frtb_sa_capital_output"
 
 FRTB_QUERIES = [
+    ("scan_only_count",
+     f"""SELECT COUNT(*) FROM {PARQUET1_VIEW}"""),
+
+    ("scan_only_sum1col",
+     f"""SELECT SUM(total) FROM {PARQUET1_VIEW}"""),
+
     ("full_agg",
      f"""SELECT SUM(commodities_delta+commodities_vega+commodities_curvature) AS commodities_sa,
                 SUM(equities_delta+equities_vega+equities_curvature) AS equities_sa,
