@@ -105,8 +105,12 @@ for qid, sql in FRTB_QUERIES:
         print(f"    all runs failed — skipping", file=sys.stderr, flush=True)
         results[qid] = {"median_ms": None, "p99_ms": None, "times_ms": [], "error": "all runs failed"}
 
+# Print results BEFORE stopping Spark — the JVM may exit non-zero during
+# shutdown (Netty connection-reset on Windows) which would prevent the print.
+print(json.dumps(results))
+sys.stdout.flush()
+
 try:
     spark.stop()
 except Exception:
     pass
-print(json.dumps(results))  # JSON to stdout for parent to capture

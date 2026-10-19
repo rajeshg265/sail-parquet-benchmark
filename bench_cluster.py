@@ -157,9 +157,15 @@ def bench_spark():
         stderr=None,   # stderr flows through to terminal so progress is visible
         text=True,
     )
-    if proc.returncode != 0:
-        raise RuntimeError(f"Spark worker exited with code {proc.returncode}")
-    return json.loads(proc.stdout.strip())
+    # Try to parse JSON even if exit code is non-zero — the JVM may crash
+    # during Netty shutdown (Windows) after results are already written.
+    stdout = proc.stdout.strip()
+    if stdout:
+        try:
+            return json.loads(stdout)
+        except json.JSONDecodeError:
+            pass
+    raise RuntimeError(f"Spark worker exited with code {proc.returncode} and produced no valid JSON")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
