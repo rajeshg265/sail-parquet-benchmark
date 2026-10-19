@@ -6,6 +6,10 @@ Python process with no pysail module state. Writes JSON results to stdout.
 import os, sys, json, time, statistics
 from pathlib import Path
 
+# Clear any SparkConnect env vars inherited from pysail parent process
+for _k in ["SPARK_REMOTE", "SPARK_CONNECT_MODE_ENABLED"]:
+    os.environ.pop(_k, None)
+
 DATA_DIR = str(Path(__file__).parent / "data")
 N_RUNS   = 10
 PARQUET1_VIEW = "frtb_sa_capital_output"

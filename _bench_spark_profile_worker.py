@@ -11,6 +11,9 @@ Additions over _bench_spark_worker.py:
 """
 import os, sys, json, time, re, glob, statistics, io
 from pathlib import Path
+
+for _k in ["SPARK_REMOTE", "SPARK_CONNECT_MODE_ENABLED"]:
+    os.environ.pop(_k, None)
 try:
     import zstandard as zstd
     _HAS_ZSTD = True
